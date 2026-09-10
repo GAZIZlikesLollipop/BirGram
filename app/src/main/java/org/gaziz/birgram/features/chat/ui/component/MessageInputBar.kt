@@ -5,7 +5,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -54,63 +54,62 @@ fun MessageInputBar(
         }
     }
     val scrollState = rememberScrollState()
-    BoxWithConstraints {
-        val halfHeight = maxHeight / 2
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(containerColor)
+    val window = LocalWindowInfo.current
+    val height = window.containerDpSize.height/4
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(containerColor)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextField(
-                    value = message,
-                    onValueChange = { message = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(scrollState)
-                        .heightIn(max = halfHeight),
-                    placeholder = {
-                        Text(
-                            text = placeholderText,
-                            fontSize = fontSize,
-                            lineHeight = fontSize
-                        )
-                    },
-                    textStyle = MaterialTheme.typography.labelSmall.copy(
+            TextField(
+                value = message,
+                onValueChange = { message = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .heightIn(max = height),
+                placeholder = {
+                    Text(
+                        text = placeholderText,
                         fontSize = fontSize,
                         lineHeight = fontSize
-                    ),
-                    colors = TextFieldDefaults.colors().copy(
-                        unfocusedContainerColor = containerColor,
-                        errorContainerColor = containerColor,
-                        disabledContainerColor = containerColor,
-                        focusedContainerColor = containerColor,
-
-                        focusedIndicatorColor = indicatorColor,
-                        errorIndicatorColor = indicatorColor,
-                        disabledIndicatorColor = indicatorColor,
-                        unfocusedIndicatorColor = indicatorColor
                     )
+                },
+                textStyle = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = fontSize,
+                    lineHeight = fontSize
+                ),
+                colors = TextFieldDefaults.colors().copy(
+                    unfocusedContainerColor = containerColor,
+                    errorContainerColor = containerColor,
+                    disabledContainerColor = containerColor,
+                    focusedContainerColor = containerColor,
+
+                    focusedIndicatorColor = indicatorColor,
+                    errorIndicatorColor = indicatorColor,
+                    disabledIndicatorColor = indicatorColor,
+                    unfocusedIndicatorColor = indicatorColor
                 )
-                AnimatedVisibility(
-                    visible = message.isNotBlank(),
-                    enter = slideInHorizontally(initialOffsetX = { it }),
-                    exit = slideOutHorizontally(targetOffsetX = { it })
-                ) {
-                    IconButton(
-                        onClick = {
-                            sendMessage(message)
-                            message = ""
-                        }
-                    ) {
-                        Icon(
-                            imageVector = send,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+            )
+            AnimatedVisibility(
+                visible = message.isNotBlank(),
+                enter = slideInHorizontally(initialOffsetX = { it }),
+                exit = slideOutHorizontally(targetOffsetX = { it })
+            ) {
+                IconButton(
+                    onClick = {
+                        sendMessage(message)
+                        message = ""
                     }
+                ) {
+                    Icon(
+                        imageVector = send,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
