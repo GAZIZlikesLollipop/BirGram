@@ -3,7 +3,6 @@ package org.gaziz.birgram.features.chat.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -78,7 +77,7 @@ fun ChatScreen(
                     size = 40.dp
                 ),
                 title = TitleUiState(
-                    title = if(chat?.isDeleted == true) deletedAccount else chat?.title,
+                    title = if (chat?.isDeleted == true) deletedAccount else chat?.title,
                     fontSize = 6.sp
                 ),
                 info = chat?.typeInfo,
@@ -89,9 +88,7 @@ fun ChatScreen(
         bottomBar = {
             chat?.let { c ->
                 if(c.canSendTextMessages) {
-                    val height = 60.dp
                     MessageInputBar(
-                        modifier = Modifier.height(height),
                         defaultText = c.draftText,
                         fontSize = 8.sp,
                         sendMessage = { viewModel.sendMessageText(c.id,it) },
@@ -99,14 +96,13 @@ fun ChatScreen(
                     )
                 }
             }
-        },
+        }
     ) { paddingValues ->
         val fontSize = 6.sp
         if (messages.isNotEmpty()) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(paddingValues)
                     .background(containerColor),
                 horizontalAlignment = Alignment.CenterHorizontally,

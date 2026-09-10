@@ -5,8 +5,13 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.gaziz.birgram.R
 import org.gaziz.birgram.core.ui.icon.send
+import org.gaziz.birgram.core.ui.theme.BirGramTheme
 
 @Composable
 fun MessageInputBar(
@@ -44,59 +53,82 @@ fun MessageInputBar(
             setDraft(message)
         }
     }
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(containerColor)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+    val scrollState = rememberScrollState()
+    BoxWithConstraints {
+        val halfHeight = maxHeight / 2
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(containerColor)
         ) {
-            TextField(
-                value = message,
-                onValueChange = { message = it },
-                modifier = Modifier.weight(1f),
-                placeholder = {
-                    Text(
-                        text = placeholderText,
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = message,
+                    onValueChange = { message = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(scrollState)
+                        .heightIn(max = halfHeight),
+                    placeholder = {
+                        Text(
+                            text = placeholderText,
+                            fontSize = fontSize,
+                            lineHeight = fontSize
+                        )
+                    },
+                    textStyle = MaterialTheme.typography.labelSmall.copy(
                         fontSize = fontSize,
                         lineHeight = fontSize
-                    )
-                },
-                textStyle = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = fontSize,
-                    lineHeight = fontSize
-                ),
-                colors = TextFieldDefaults.colors().copy(
-                    unfocusedContainerColor = containerColor,
-                    errorContainerColor = containerColor,
-                    disabledContainerColor = containerColor,
-                    focusedContainerColor = containerColor,
+                    ),
+                    colors = TextFieldDefaults.colors().copy(
+                        unfocusedContainerColor = containerColor,
+                        errorContainerColor = containerColor,
+                        disabledContainerColor = containerColor,
+                        focusedContainerColor = containerColor,
 
-                    focusedIndicatorColor = indicatorColor,
-                    errorIndicatorColor = indicatorColor,
-                    disabledIndicatorColor = indicatorColor,
-                    unfocusedIndicatorColor = indicatorColor
-                )
-            )
-            AnimatedVisibility(
-                visible = message.isNotBlank(),
-                enter = slideInHorizontally(initialOffsetX = {it}),
-                exit = slideOutHorizontally(targetOffsetX = {it})
-            ) {
-                IconButton(
-                    onClick = {
-                        sendMessage(message)
-                        message = ""
-                    }
-                ) {
-                    Icon(
-                        imageVector = send,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                        focusedIndicatorColor = indicatorColor,
+                        errorIndicatorColor = indicatorColor,
+                        disabledIndicatorColor = indicatorColor,
+                        unfocusedIndicatorColor = indicatorColor
                     )
+                )
+                AnimatedVisibility(
+                    visible = message.isNotBlank(),
+                    enter = slideInHorizontally(initialOffsetX = { it }),
+                    exit = slideOutHorizontally(targetOffsetX = { it })
+                ) {
+                    IconButton(
+                        onClick = {
+                            sendMessage(message)
+                            message = ""
+                        }
+                    ) {
+                        Icon(
+                            imageVector = send,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun MessageInputBarPreview() {
+BirGramTheme(
+    darkTheme = true
+    ) {
+        MessageInputBar(
+            modifier = Modifier.height(80.dp),
+            defaultText = "",
+            fontSize = 8.sp,
+            sendMessage = {},
+            setDraft = {}
+        )
     }
 }
