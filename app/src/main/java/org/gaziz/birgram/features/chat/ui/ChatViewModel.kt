@@ -322,6 +322,8 @@ class ChatViewModel @Inject constructor(
     var player: ExoPlayer? = null
     private val _mediaPosition = MutableStateFlow(0)
     val mediaPosition = _mediaPosition.asStateFlow()
+    private var _isMediaPlaying = MutableStateFlow(false)
+    val isMediaPlaying = _isMediaPlaying.asStateFlow()
     fun createPlayer(
         context: Context
     ) {
@@ -333,6 +335,7 @@ class ChatViewModel @Inject constructor(
                 addListener(
                     object : Player.Listener {
                         override fun onIsPlayingChanged(isPlaying: Boolean) {
+                            _isMediaPlaying.update { isPlaying }
                             if(mediaItemCount > 0) {
                                 if (!isPlaying) {
                                     seekTo(0L)
@@ -340,7 +343,10 @@ class ChatViewModel @Inject constructor(
                                 } else {
                                     viewModelScope.launch {
                                         _mediaPosition.update { (duration/1000).toInt() }
-                                        while(mediaPosition.value > 0){
+                                        while(
+                                            mediaPosition.value > 0 &&
+                                            isMediaPlaying.value
+                                        ){
                                             delay(1000)
                                             _mediaPosition.update { it-1 }
                                         }
